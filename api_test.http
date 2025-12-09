@@ -1,0 +1,7 @@
+### Test Send OTP Endpoint
+POST http://localhost:3000/send-otp
+Content-Type: application/json
+
+{
+    "email": "vaibhavsable150@gmail.com"
+}

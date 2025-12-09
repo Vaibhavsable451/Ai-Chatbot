@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Kairo AI</title>
+    <link rel="stylesheet" href="auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-left">
+            <div class="brand-logo">Kairo AI</div>
+            <h2>Create Account</h2>
+            <p class="subtitle">Join the future of AI conversation.</p>
+
+            <!-- Step 1: Email -->
+            <div id="step1">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="name@example.com" required>
+                </div>
+                <button class="btn-primary" id="sendOtpBtn" onclick="handleSendOTP()">
+                    Send OTP <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Step 2: OTP -->
+            <div id="step2" style="display: none;">
+                <div class="form-group">
+                    <label for="otp">Enter Verification Code</label>
+                    <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 10px;">
+                        We sent a code to your email.
+                    </p>
+                    <input type="text" id="otp" placeholder="123456" maxlength="6">
+                </div>
+                <button class="btn-primary" onclick="handleVerify()">
+                    Verify & Create Account
+                </button>
+                <button class="btn-primary" style="background: transparent; border: 1px solid #4b5563; margin-top: 10px;" onclick="resetSignup()">
+                    Back
+                </button>
+            </div>
+
+            <div class="auth-link">
+                Already have an account? <a href="login.html">Sign In</a>
+            </div>
+        </div>
+        <div class="auth-right">
+            <img src="assets/kairo_hero.png" alt="Kairo AI Agent" class="hero-image">
+            <h3 style="margin-top: 20px; color: #e2e8f0;">Your Personal AI Assistant</h3>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        async function handleSendOTP() {
+            const email = document.getElementById('email').value;
+            const btn = document.getElementById('sendOtpBtn');
+            const originalText = btn.innerHTML;
+
+            // Loading State
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+            const success = await Auth.sendOTP(email);
+
+            // Reset State
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+
+            if (success) {
+                // Show Step 2
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'block';
+            }
+        }
+
+        function handleVerify() {
+            const enteredOtp = document.getElementById('otp').value;
+            const success = Auth.verifyAndSignup(enteredOtp);
+
+            if (success) {
+                alert("Account created successfully! Please login.");
+                window.location.href = 'login.html';
+            }
+        }
+
+        function resetSignup() {
+            document.getElementById('step1').style.display = 'block';
+            document.getElementById('step2').style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>

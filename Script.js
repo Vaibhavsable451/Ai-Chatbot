@@ -1,6 +1,6 @@
-﻿const Api_Url = "https://api.groq.com/openai/v1/chat/completions";
-// TODO: Replace with your actual Groq API key (do not commit the real key)
-const Api_Key = "YOUR_GROQ_API_KEY_HERE";
+﻿const Api_Url = "/chat";
+// API Key is now handled by the backend server
+const Api_Key = "";
 
 // DOM Elements
 const chatContainer = document.querySelector("#chat-container");
@@ -190,8 +190,7 @@ async function fetchAndStream(requestBody, textArea, aiChatBox, responseContent)
         const response = await fetch(Api_Url, {
             method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${Api_Key}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(requestBody),
             signal: abortController.signal

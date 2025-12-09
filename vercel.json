@@ -1,0 +1,12 @@
+{
+    "version": 2,
+    "rewrites": [{
+            "source": "/chat",
+            "destination": "/server.js"
+        },
+        {
+            "source": "/send-otp",
+            "destination": "/server.js"
+        }
+    ]
+}

@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,6 +12,9 @@ app.use(cors());
 app.use(express.json({
     limit: '50mb'
 })); // Increased limit for images
+
+// Serve static files from the current directory
+app.use(express.static(__dirname));
 
 // Email Transporter
 const transporter = nodemailer.createTransport({
@@ -132,6 +136,11 @@ app.post('/chat', async (req, res) => {
             error: "Failed to fetch response from AI"
         });
     }
+});
+
+// Serve index.html for the root route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Export the app for Vercel

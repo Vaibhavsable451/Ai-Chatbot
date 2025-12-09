@@ -91,64 +91,49 @@ app.post('/send-otp', async (req, res) => {
 
 // Chat Endpoint (Proxy to Groq)
 app.post('/chat', async (req, res) => {
-    try {
-        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
-            },
-            body: JSON.stringify(req.body)
-        });
+                try {
+                    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+                        },
+                        body: JSON.stringify(req.body)
+                    });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Groq API Error: ${response.status} - ${errorText}`);
-        }
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Groq API Error: ${response.status} - ${errorText}`);
+                    }
 
-        // Pipe the stream directly to the client
-        // Note: fetch in Node 18+ returns a web stream, but Express expects a node stream.
-        // For simplicity with text/event-stream, we can just iterate and write.
+                    // Pipe the stream directly to the client
+                    // Note: fetch in Node 18+ returns a web stream, but Express expects a node stream.
+                    // For simplicity with text/event-stream, we can just iterate and write.
 
-        res.setHeader('Content-Type', 'text/event-stream');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Connection', 'keep-alive');
+                    res.setHeader('Content-Type', 'text/event-stream');
+                    res.setHeader('Cache-Control', 'no-cache');
+                    res.setHeader('Connection', 'keep-alive');
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
 
-        while (true) {
-            const {
-                done,
-                value
-            } = await reader.read();
-            if (done) break;
-            const chunk = decoder.decode(value, {
-                stream: true
-            });
-            res.write(chunk);
-        }
-        res.end();
+                    while (true) {
+                        const {
+                            done,
+                            value
+                        } = await reader.read();
+                        if (done) break;
+                        const chunk = decoder.decode(value, {
+                            stream: true
+                        });
+                        res.write(chunk);
+                    }
+                    res.end();
 
-    } catch (error) {
-        console.error("Chat API Error:", error);
-        res.status(500).json({
-            error: "Failed to fetch response from AI"
-        });
-    }
-});
-
-// Serve index.html for the root route
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Export the app for Vercel
-module.exports = app;
-
-// Only start the server if running locally
-if (require.main === module) {
-    app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
-    });
-}
+                } catch (error) {
+                    console.error("Chat API Error:", error);
+                    if (require.main === module) {
+                        app.listen(PORT, () => {
+                            console.log(`Server running on http://localhost:${PORT}`);
+                        });
+                    }

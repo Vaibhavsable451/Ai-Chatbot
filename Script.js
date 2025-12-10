@@ -1,5 +1,7 @@
-﻿// API Key is now handled by the backend server
-const Api_Url = window.API_CONFIG ? .ENDPOINTS ? .CHAT || "/api/chat";
+// API Key is now handled by the backend server
+const Api_Key = "";
+// API Key is now handled by the backend server
+const Api_Url = window.API_CONFIG ?.ENDPOINTS ?.CHAT || "/api/chat";
 
 
 // DOM Elements

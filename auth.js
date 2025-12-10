@@ -9,7 +9,7 @@ const Auth = {
         }
 
         try {
-            const response = await fetch('/api/send-otp', {
+            const response = await fetch(window.API_CONFIG.ENDPOINTS.SEND_OTP, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -36,7 +36,7 @@ const Auth = {
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("Could not connect to the server. Make sure 'node server.js' is running.");
+            alert("Could not connect to the server. Please check your internet connection or try again later.");
             return false;
         }
     },

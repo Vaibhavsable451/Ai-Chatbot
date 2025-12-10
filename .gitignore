@@ -23,3 +23,7 @@ Thumbs.db
 # Build outputs
 dist/
 build/
+.vercel
+
+# Local Netlify folder
+.netlify

@@ -1,7 +1,28 @@
 {
     "version": 2,
-    "rewrites": [{
-        "source": "/(.*)",
-        "destination": "/server.js"
-    }]
+    "builds": [{
+        "src": "api/**/*.js",
+        "use": "@vercel/node"
+    }],
+    "routes": [{
+            "src": "/api/(.*)",
+            "dest": "/api/$1"
+        },
+        {
+            "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|svg|ico|webp))",
+            "dest": "/$1"
+        },
+        {
+            "src": "/",
+            "dest": "/index.html"
+        },
+        {
+            "src": "/(login|signup|chat)\\.html",
+            "dest": "/$1.html"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/index.html"
+        }
+    ]
 }

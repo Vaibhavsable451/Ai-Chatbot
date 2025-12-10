@@ -1,4 +1,4 @@
-﻿const Api_Url = "/chat";
+﻿const Api_Url = "/api/chat";
 // API Key is now handled by the backend server
 const Api_Key = "";
 

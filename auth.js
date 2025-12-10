@@ -9,7 +9,7 @@ const Auth = {
         }
 
         try {
-            const response = await fetch('/send-otp', {
+            const response = await fetch('/api/send-otp', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

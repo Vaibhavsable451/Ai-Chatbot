@@ -35,7 +35,7 @@ transporter.verify(function(error, success) {
 });
 
 // Endpoint to send OTP
-app.post('/send-otp', async (req, res) => {
+app.post('/api/send-otp', async (req, res) => {
     const {
         email
     } = req.body;
@@ -90,7 +90,7 @@ app.post('/send-otp', async (req, res) => {
 });
 
 // Chat Endpoint (Proxy to Groq)
-app.post('/chat', async (req, res) => {
+app.post('/api/chat', async (req, res) => {
     try {
         const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",

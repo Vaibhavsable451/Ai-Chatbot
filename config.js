@@ -14,7 +14,7 @@
 // For production (update this with your Vercel URL)
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ?
     'http://localhost:3000' :
-    'https://kairo-ai-chatbot.vercel.app';
+    'https://aichatbot-vaibhavs-projects-4e49c010.vercel.app';
 
 // API Endpoints
 const API_ENDPOINTS = {

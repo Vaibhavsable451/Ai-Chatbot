@@ -1,5 +1,6 @@
 ﻿// API Key is now handled by the backend server
-const Api_Key = "";
+const Api_Url = window.API_CONFIG ? .ENDPOINTS ? .CHAT || "/api/chat";
+
 
 // DOM Elements
 const chatContainer = document.querySelector("#chat-container");
@@ -186,6 +187,7 @@ async function fetchAndStream(requestBody, textArea, aiChatBox, responseContent)
     let responseDiv;
 
     try {
+        console.log("Sending request to:", Api_Url);
         const response = await fetch(Api_Url, {
             method: "POST",
             headers: {
@@ -195,7 +197,11 @@ async function fetchAndStream(requestBody, textArea, aiChatBox, responseContent)
             signal: abortController.signal
         });
 
-        if (!response.ok) throw new Error("API Error");
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("API Error Details:", response.status, errorText);
+            throw new Error(`API Error: ${response.status}`);
+        }
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();

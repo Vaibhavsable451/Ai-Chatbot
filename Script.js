@@ -380,7 +380,9 @@ async function generateResponse(aiChatBox) {
         reader.readAsDataURL(imageFile);
         reader.onloadend = async () => {
             const base64Image = reader.result.split(',')[1];
-            requestBody.messages[1].content = [{
+            // Update the LAST message which is the current user message
+            const lastMsgIndex = requestBody.messages.length - 1;
+            requestBody.messages[lastMsgIndex].content = [{
                     type: "text",
                     text: finalMessage
                 },

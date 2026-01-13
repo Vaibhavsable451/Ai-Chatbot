@@ -264,15 +264,9 @@ function setupTheme() {
 }
 
 function scrollToBottom() {
-    const lastMessage = chatContainer.lastElementChild;
-    if (lastMessage) {
-        lastMessage.scrollIntoView({
-            behavior: "instant",
-            block: "end"
-        });
-    } else {
+    requestAnimationFrame(() => {
         chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
+    });
 }
 
 function stopOngoingActions() {
@@ -451,7 +445,9 @@ async function fetchAndStream(requestBody, textArea, aiChatBox, responseContent)
                         responseContent += content;
                         responseDiv.innerHTML = marked.parse(responseContent);
                         hljs.highlightAll();
-                        scrollToBottom();
+                        requestAnimationFrame(() => {
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                        });
                     } catch (e) {
                         // Skip invalid JSON
                     }

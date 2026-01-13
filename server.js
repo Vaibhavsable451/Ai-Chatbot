@@ -111,8 +111,11 @@ app.post('/api/chat', async (req, res) => {
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
 
-        // Node-fetch returns a standard Node stream in 'body'
-        response.body.pipe(res);
+        // Native Fetch returns a Web Stream (iterable)
+        for await (const chunk of response.body) {
+            res.write(chunk);
+        }
+        res.end();
 
     } catch (error) {
         console.error("Chat API Error:", error);

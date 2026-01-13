@@ -111,21 +111,8 @@ app.post('/api/chat', async (req, res) => {
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-
-        while (true) {
-            const {
-                done,
-                value
-            } = await reader.read();
-            if (done) break;
-            const chunk = decoder.decode(value, {
-                stream: true
-            });
-            res.write(chunk);
-        }
-        res.end();
+        // Node-fetch returns a standard Node stream in 'body'
+        response.body.pipe(res);
 
     } catch (error) {
         console.error("Chat API Error:", error);

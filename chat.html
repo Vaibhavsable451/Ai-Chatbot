@@ -20,45 +20,87 @@
 
 <body>
     <div class="container">
-        <div class="chat-container" id="chat-container">
-            <!-- Messages appear here -->
-        </div>
-        <!-- PDF Viewer Modal -->
-        <div id="pdfViewer" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <iframe id="pdfFrame" style="width:100%; height:90vh; border:none;"></iframe>
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <img src="assets/ai.png" alt="Kairo" class="brand-logo" onerror="this.src='ai.png'">
+                    <h2>Kairo Chatbot</h2>
+                </div>
+                <div class="sidebar-actions">
+                    <button id="newChatBtn" class="new-chat-btn">
+                        <i class="fas fa-plus"></i> New chat
+                    </button>
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchChats" placeholder="Search chats..." maxlength="30">
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="input-area">
-            <div class="file-upload">
-                <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.gif" hidden multiple />
-                <label for="fileInput" class="icon-button" title="Upload files (PDF, Images)">
-                    <img src="img.svg" alt="Upload Files" />
-                </label>
-                <div id="filePreview" class="file-preview"></div>
+            <div class="history-container">
+                <div class="history-label">Your chats</div>
+                <div id="historyList" class="history-list">
+                    <!-- History items will be populated by JS -->
+                </div>
             </div>
-            <input type="text" id="prompt" placeholder="Type your message..." maxlength="200" />
-            <button id="micBtn" class="icon-button" title="Voice Input"><i class="fas fa-microphone"></i></button>
-            <button id="stopBtn" class="icon-button hidden" title="Stop Generation"><i class="fas fa-stop"></i></button>
-            <button id="submit" class="icon-button"><img src="submit.svg" alt="Send" /></button>
-        </div>
-        <div class="theme-toggle">
-            <select id="themeSelector" class="theme-selector" title="Select Theme">
-                <option value="dark">Dark</option>
-                <option value="light">Light</option>
-                <option value="neon">Neon Cyber</option>
-                <option value="sunset">Sunset Vibes</option>
-                <option value="ocean">Ocean Blue</option>
-                <option value="forest">Forest Green</option>
-                <option value="purple">Purple Rain</option>
-                <option value="minimal">Minimal Gray</option>
-            </select>
-            <button id="logoutBtn" class="icon-button" title="Logout" style="margin-top: 10px;">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
-        </div>
+
+            <div class="sidebar-footer">
+                <button id="clearHistoryBtn" class="sidebar-link" title="Delete all history">
+                    <i class="fas fa-trash-alt"></i> Clear all history
+                </button>
+                <button id="logoutBtn" class="sidebar-link" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i> Log out
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="main-content">
+            <div class="mobile-header">
+                <button id="sidebarToggle" class="icon-button"><i class="fas fa-bars"></i></button>
+                <h3>Kairo Chatbot</h3>
+            </div>
+
+            <div class="theme-toggle">
+                <select id="themeSelector" class="theme-selector" title="Select Theme">
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                    <option value="neon">Neon Cyber</option>
+                    <option value="sunset">Sunset Vibes</option>
+                    <option value="ocean">Ocean Blue</option>
+                    <option value="forest">Forest Green</option>
+                    <option value="purple">Purple Rain</option>
+                    <option value="minimal">Minimal Gray</option>
+                </select>
+            </div>
+
+            <div class="chat-container" id="chat-container">
+                <!-- Messages appear here -->
+            </div>
+
+            <!-- PDF Viewer Modal -->
+            <div id="pdfViewer" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <iframe id="pdfFrame" style="width:100%; height:90vh; border:none;"></iframe>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="file-upload">
+                    <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.gif" hidden multiple />
+                    <label for="fileInput" class="icon-button" title="Upload files (PDF, Images)">
+                        <img src="img.svg" alt="Upload Files" />
+                    </label>
+                    <div id="filePreview" class="file-preview"></div>
+                </div>
+                <input type="text" id="prompt" placeholder="Type your message..." maxlength="200" />
+                <button id="micBtn" class="icon-button" title="Voice Input"><i class="fas fa-microphone"></i></button>
+                <button id="stopBtn" class="icon-button hidden" title="Stop Generation"><i class="fas fa-stop"></i></button>
+                <button id="submit" class="icon-button"><img src="submit.svg" alt="Send" /></button>
+            </div>
+        </main>
     </div>
     <!-- CDNs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>

@@ -1,9 +1,6 @@
 ﻿// API Key is now handled by the backend server
 const Api_Key = "";
-// API Key is now handled by the backend server
 const Api_Url = window.API_CONFIG ? .ENDPOINTS ? .CHAT || "/api/chat";
-
-
 
 // DOM Elements
 const chatContainer = document.querySelector("#chat-container");
@@ -18,6 +15,15 @@ const pdfFrame = document.getElementById("pdfFrame");
 const closeModal = document.querySelector(".close");
 const themeSelector = document.querySelector("#themeSelector");
 
+// Sidebar Elements
+const sidebar = document.getElementById("sidebar");
+const sidebarToggle = document.getElementById("sidebarToggle");
+const newChatBtn = document.getElementById("newChatBtn");
+const searchChatsInput = document.getElementById("searchChats");
+const historyList = document.getElementById("historyList");
+const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+
 // State
 let user = {
     message: null,
@@ -26,6 +32,8 @@ let user = {
 };
 let abortController = null;
 let isSpeaking = false;
+let chats = [];
+let currentChatId = null;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -33,7 +41,198 @@ document.addEventListener('DOMContentLoaded', () => {
     isSpeaking = false;
     setupTheme();
     setupMarkdown();
+    loadChats();
+    setupSidebarListeners();
 });
+
+// --- Chat Management Functions ---
+
+function loadChats() {
+    const savedChats = localStorage.getItem('chats');
+    if (savedChats) {
+        chats = JSON.parse(savedChats);
+        const lastChatId = localStorage.getItem('currentChatId');
+        if (lastChatId && chats.find(c => c.id === lastChatId)) {
+            loadChat(lastChatId);
+        } else {
+            createNewChat();
+        }
+    } else {
+        createNewChat();
+    }
+    renderHistoryList();
+}
+
+function saveChats() {
+    localStorage.setItem('chats', JSON.stringify(chats));
+}
+
+function createNewChat() {
+    const id = Date.now().toString();
+    const newChat = {
+        id: id,
+        title: "New Chat",
+        timestamp: Date.now(),
+        messages: []
+    };
+    chats.unshift(newChat);
+    currentChatId = id;
+    localStorage.setItem('currentChatId', currentChatId);
+    saveChats();
+
+    // Clear UI
+    chatContainer.innerHTML = '';
+    promptInput.value = '';
+    filePreview.innerHTML = '';
+    user.files = [];
+    user.fileContext = "";
+
+    // Rerender list to show new chat at top
+    renderHistoryList();
+
+    // On mobile, close sidebar after creating new chat
+    if (window.innerWidth <= 768) {
+        sidebar.classList.remove("open");
+    }
+}
+
+function loadChat(id) {
+    const chat = chats.find(c => c.id === id);
+    if (!chat) return;
+
+    currentChatId = id;
+    localStorage.setItem('currentChatId', currentChatId);
+
+    // Clear UI
+    chatContainer.innerHTML = '';
+
+    // Render Messages
+    chat.messages.forEach(msg => {
+        const isUser = msg.role === 'user';
+        const className = isUser ? 'user-chat-box' : 'ai-chat-box';
+        const img = isUser ? 'user.png' : 'ai.png';
+
+        let contentHtml = '';
+        if (isUser) {
+            contentHtml = `<div class="user-chat-area">
+                ${msg.text ? `<div>${msg.text}</div>` : ""}
+                <div class="timestamp">${msg.timestamp || ''}</div>
+            </div>`;
+        } else {
+            contentHtml = `<div class="ai-chat-area">
+                <div class="ai-response">${marked.parse(msg.text)}</div>
+            </div>`;
+        }
+
+        const html = `
+            <img src="${img}" width="${isUser ? '8%' : '10%'}" />
+            ${contentHtml}
+        `;
+
+        const div = createChatBox(html, className);
+        chatContainer.appendChild(div);
+
+        // Add controls for AI messages
+        if (!isUser) {
+            const textArea = div.querySelector(".ai-chat-area");
+            addControlsToResponse(textArea, msg.text);
+        }
+    });
+
+    hljs.highlightAll();
+    scrollToBottom();
+    renderHistoryList();
+
+    // Mobile close trigger
+    if (window.innerWidth <= 768) {
+        sidebar.classList.remove("open");
+    }
+}
+
+function addMessageToState(role, text) {
+    const chat = chats.find(c => c.id === currentChatId);
+    if (!chat) return;
+
+    chat.messages.push({
+        role: role,
+        text: text,
+        timestamp: getCurrentTimestamp()
+    });
+
+    // Update title if it's the first message and it's user
+    if (role === 'user' && chat.messages.length === 1) {
+        chat.title = text.substring(0, 30) + (text.length > 30 ? '...' : '');
+    }
+
+    // Move chat to top
+    chats = chats.filter(c => c.id !== currentChatId);
+    chats.unshift(chat);
+
+    saveChats();
+    renderHistoryList();
+}
+
+function deleteHistory() {
+    if (confirm("Are you sure you want to delete all chat history?")) {
+        chats = [];
+        localStorage.removeItem('chats');
+        localStorage.removeItem('currentChatId');
+        createNewChat();
+    }
+}
+
+function renderHistoryList() {
+    const filter = searchChatsInput.value.toLowerCase();
+    historyList.innerHTML = '';
+
+    chats.forEach(chat => {
+        if (chat.title.toLowerCase().includes(filter)) {
+            const div = document.createElement('div');
+            div.className = `history-item ${chat.id === currentChatId ? 'active' : ''}`;
+            div.innerHTML = `<i class="far fa-comment-alt"></i> <span>${chat.title}</span>`;
+            div.onclick = () => loadChat(chat.id);
+            historyList.appendChild(div);
+        }
+    });
+}
+
+function setupSidebarListeners() {
+    newChatBtn.addEventListener('click', createNewChat);
+    clearHistoryBtn.addEventListener('click', deleteHistory);
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            // localStorage.clear(); // Maybe don't clear history if they want to keep it?
+            // User requested "logout" which usually implies clearing session. 
+            // But preserving history might be nice. Current logic clears everything.
+            localStorage.clear();
+            window.location.href = "login.html";
+        });
+    }
+
+    if (searchChatsInput) {
+        searchChatsInput.addEventListener('input', renderHistoryList);
+    }
+
+    // Mobile Sidebar Toggle
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768 &&
+            sidebar.classList.contains('open') &&
+            !sidebar.contains(e.target) &&
+            !sidebarToggle.contains(e.target)) {
+            sidebar.classList.remove('open');
+        }
+    });
+}
+
+// --- Existing Logic Updated ---
 
 // Markdown & Highlight.js Setup
 function setupMarkdown() {
@@ -242,6 +441,9 @@ async function fetchAndStream(requestBody, textArea, aiChatBox, responseContent)
 
         addControlsToResponse(textArea, responseContent);
 
+        // SAVE AI RESPONSE
+        addMessageToState('assistant', responseContent);
+
         // AUTO-SPEAK
         if (responseContent.trim()) {
             speakText(responseContent);
@@ -263,6 +465,9 @@ async function fetchAndStream(requestBody, textArea, aiChatBox, responseContent)
 }
 
 function addControlsToResponse(textArea, text) {
+    // Only add if not already there
+    if (textArea.querySelector(".controls")) return;
+
     const controlsHtml = `
         <div class="controls">
             <button class="control-btn" onclick="copyText(this)"><i class="fas fa-copy"></i></button>
@@ -285,6 +490,9 @@ submitBtn.addEventListener("click", async () => {
 
     user.message = text;
     user.fileContext = "";
+
+    // Add User Message to State
+    addMessageToState('user', text);
 
     const pdfFiles = user.files.filter(f => f.type === "application/pdf");
     for (const file of pdfFiles) {
@@ -361,12 +569,3 @@ closeModal.onclick = function() {
     pdfViewer.style.display = "none";
     pdfFrame.src = "";
 };
-
-// Logout
-const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-        localStorage.clear();
-        window.location.href = "login.html";
-    });
-}

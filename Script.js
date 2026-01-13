@@ -264,9 +264,15 @@ function setupTheme() {
 }
 
 function scrollToBottom() {
-    setTimeout(() => {
+    const lastMessage = chatContainer.lastElementChild;
+    if (lastMessage) {
+        lastMessage.scrollIntoView({
+            behavior: "instant",
+            block: "end"
+        });
+    } else {
         chatContainer.scrollTop = chatContainer.scrollHeight;
-    }, 10);
+    }
 }
 
 function stopOngoingActions() {

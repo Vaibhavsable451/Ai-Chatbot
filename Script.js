@@ -1,6 +1,6 @@
 ﻿// API Key is now handled by the backend server
 const Api_Key = "";
-const Api_Url = window.API_CONFIG ? .ENDPOINTS ? .CHAT || "/api/chat";
+const Api_Url = window.API_CONFIG ?.ENDPOINTS ?.CHAT || "/api/chat";
 
 // DOM Elements
 const chatContainer = document.querySelector("#chat-container");

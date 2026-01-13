@@ -68,6 +68,7 @@ function saveChats() {
 }
 
 function createNewChat() {
+    stopOngoingActions();
     const id = Date.now().toString();
     const newChat = {
         id: id,
@@ -100,6 +101,7 @@ function loadChat(id) {
     const chat = chats.find(c => c.id === id);
     if (!chat) return;
 
+    stopOngoingActions();
     currentChatId = id;
     localStorage.setItem('currentChatId', currentChatId);
 
@@ -174,6 +176,7 @@ function addMessageToState(role, text) {
 
 function deleteHistory() {
     if (confirm("Are you sure you want to delete all chat history?")) {
+        stopOngoingActions();
         chats = [];
         localStorage.removeItem('chats');
         localStorage.removeItem('currentChatId');
@@ -261,10 +264,19 @@ function setupTheme() {
 }
 
 function scrollToBottom() {
-    chatContainer.scrollTo({
-        top: chatContainer.scrollHeight,
-        behavior: "smooth"
-    });
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function stopOngoingActions() {
+    if (abortController) {
+        abortController.abort();
+        abortController = null;
+    }
+    window.speechSynthesis.cancel();
+    isSpeaking = false;
+    // Reset UI buttons if needed
+    stopBtn.classList.add("hidden");
+    submitBtn.classList.remove("hidden");
 }
 
 function createChatBox(html, className) {
